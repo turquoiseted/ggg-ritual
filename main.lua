@@ -3,6 +3,7 @@ require "lib.lm.Animation.Animation"
 require "gameobject"
 require "player"
 require "elder"
+require "HUD"
 require "enemy"
 require "nymph"
 
@@ -13,6 +14,7 @@ elder = nil
 world = {}
 world.objects = {}
 world.next_object_id = 0
+GUI_objects = {}
 
 function world:add_game_object(g) 
     -- Called when a new GameObject is created
@@ -32,11 +34,17 @@ function world:remove_game_object(id)
 end
 
 function love.load()
+    world.secondsElapsedInDay = 0
     player = Player.new()
     elder = Elder.new()
+    hud = HUD.new()
 
     world:add_game_object(player)
     world:add_game_object(elder)
+
+    table.insert(GUI_objects, hud)
+    table.insert(world.objects, player)
+    table.insert(world.objects, elder)
 
     local nymph = Nymph.new()
     nymph.x = 300
@@ -45,6 +53,8 @@ function love.load()
 end
 
 function love.update(dt)
+    world.secondsElapsedInDay = world.secondsElapsedInDay + dt
+
     local idle = true
     if love.keyboard.isDown("left") then
         player:move("left")
@@ -74,6 +84,9 @@ end
 function love.draw(dt)
     for i=1, #world.objects do
         world.objects[i]:draw()
+    end
+    for i=1, #GUI_objects do
+        GUI_objects[i]:draw()
     end
 end
 
