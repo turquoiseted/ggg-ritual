@@ -50,7 +50,6 @@ function love.update(dt)
     end
 end
 
-
 function love.draw(dt)
     for i=1, #world.objects do
         world.objects[i]:draw()
