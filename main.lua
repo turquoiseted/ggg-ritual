@@ -1,6 +1,7 @@
 require "lib.lm.Animation.Animation"
 
 require "gameobject"
+require "speech"
 require "player"
 require "elder"
 require "HUD"
@@ -24,8 +25,10 @@ function world:add_game_object(g)
 end
 
 function world:remove_game_object(id)
-    for i=1, i<= #world.objects do
+    print("Removing game object with id: " .. id)
+    for i=1, #world.objects do
         obj = world.objects[i]
+
         if obj._id == id then
             table.remove(world.objects, i)
             break
@@ -50,6 +53,8 @@ function love.load()
     nymph.x = 300
     nymph.y = 300
     world:add_game_object(nymph)
+
+    elder:speak("Hello there!", 2)
 end
 
 function love.update(dt)
@@ -77,7 +82,11 @@ function love.update(dt)
     end
 
     for i=1, #world.objects do
-        world.objects[i]:update(dt)
+        local obj = world.objects[i]
+        obj:update(dt)
+        if obj._dead then
+            world:remove_game_object(obj._id)
+        end
     end
 end
 
