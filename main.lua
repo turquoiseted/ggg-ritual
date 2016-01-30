@@ -1,10 +1,19 @@
 require "lib.lovemachine.Animation.Animation"
 
 require "player"
+require "elder"
 
 player = nil
+elder = nil
+world = {}
+world.objects = {}
+
 function love.load()
     player = Player.new()
+    elder = Elder.new()
+
+    table.insert(world.objects, player)
+    table.insert(world.objects, elder)
 end
 
 function love.update(dt)
@@ -29,12 +38,16 @@ function love.update(dt)
         player:idle()
     end
 
-    player:update(dt)
+    for i=1, #world.objects do
+        world.objects[i]:update(dt)
+    end
 end
 
 
 function love.draw(dt)
-    player:draw()
+    for i=1, #world.objects do
+        world.objects[i]:draw()
+    end
 end
 
 function love.keypressed(key, scancode, isrepeat)

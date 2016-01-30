@@ -3,6 +3,8 @@ Player.__index = Player
 
 function Player.new()
     local p = {}
+    setmetatable(p, Player)
+
     p.x = 10
     p.y = 10
     p.vx = 0
@@ -19,7 +21,6 @@ function Player.new()
     p.animation_left = Animation.newFromFile("Animations/player_left.lua")
     p.animation_right = Animation.newFromFile("Animations/player_right.lua")
     p.current_animation = p.animation_down
-    setmetatable(p, Player)
 
     return p
 end
