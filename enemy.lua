@@ -1,8 +1,9 @@
 Enemy = {}
+setmetatable(Enemy, GameObject)
 Enemy.__index = Enemy
 
 function Enemy.new()
-    e = {}
+    local e = GameObject.new()
     setmetatable(e, Enemy)
 
     e.x = 0

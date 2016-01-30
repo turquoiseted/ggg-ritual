@@ -1,8 +1,9 @@
 Elder = {}
+setmetatable(Elder, GameObject)
 Elder.__index = Elder
 
 function Elder.new()
-    e = {}
+    local e = GameObject.new()
     setmetatable(e, Elder)
 
     e.x = 200

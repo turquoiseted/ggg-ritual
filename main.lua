@@ -1,5 +1,6 @@
 require "lib.lm.Animation.Animation"
 
+require "gameobject"
 require "player"
 require "elder"
 require "enemy"
@@ -11,17 +12,36 @@ player = nil
 elder = nil
 world = {}
 world.objects = {}
+world.next_object_id = 0
+
+function world:add_game_object(g) 
+    -- Called when a new GameObject is created
+    g._id = self.next_object_id
+    self.next_object_id = self.next_object_id + 1
+    table.insert(self.objects, g)
+end
+
+function world:remove_game_object(id)
+    for i=1, i<= #world.objects do
+        obj = world.objects[i]
+        if obj._id == id then
+            table.remove(world.objects, i)
+            break
+        end
+    end
+end
 
 function love.load()
     player = Player.new()
     elder = Elder.new()
 
-    table.insert(world.objects, player)
-    table.insert(world.objects, elder)
+    world:add_game_object(player)
+    world:add_game_object(elder)
+
     local nymph = Nymph.new()
     nymph.x = 300
     nymph.y = 300
-    table.insert(world.objects, nymph)
+    world:add_game_object(nymph)
 end
 
 function love.update(dt)
@@ -58,4 +78,7 @@ function love.draw(dt)
 end
 
 function love.keypressed(key, scancode, isrepeat)
+    if key == "space" then
+        player:attack()
+    end
 end
