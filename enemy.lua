@@ -13,14 +13,14 @@ function Enemy.new()
     e.hp_state = 2
     e.speed_stat = 7
     e.ai_state = "idle"
-    e.animation_idle = nil
-    e.animation_chasing = nil
-    e.animation_hitting = nil
-    e.animation_nearby = nil
-    e.animation_hurt = nil
-    e.animation_dying = nil
-    e.animation = nil
-    e.frames_waited = -1  -- used for waiting to perform actions
+    e.animation_idle = Animation.newFromFile("Animations/enemy/enemy_idle.lua")
+    e.animation_chasing = Animation.newFromFile("Animations/enemy/enemy_chasing.lua")
+    e.animation_hitting = Animation.newFromFile("Animations/enemy/enemy_hitting.lua")
+    e.animation_nearby = Animation.newFromFile("Animations/enemy/enemy_nearby.lua")
+    e.animation_hurt = Animation.newFromFile("Animations/enemy/enemy_hurt.lua")
+    e.animation_dying = Animation.newFromFile("Animations/enemy/enemy_dying.lua")
+    e.animation = e.animation_idle
+    e.frames_waiting = -1  -- used for waiting to perform actions
 
     return e
 end
@@ -29,30 +29,23 @@ function Enemy:update(dt)
     self.x = self.x + self.vx * dt
     self.y = self.y + self.vy * dt
 
-    -- Calculate distance to player
-    dx = self.x - player.x
-    dy = self.y - player.y
-    dist = math.sqrt(math.pow(dx, 2) + math.pow(dy, 2))
+    self.vx = 0
+    self.vy = 0
 
-    if dist <= self:get_pursuit_range() then
-        self:pursue_player()
-    else
-        self.vx = 0
-        self.vy = 0
-    end
+    self:update_AI()
 
     if self.animation then
         self.animation:update(dt)
     end
 
-    if self.frames_waiting > 0 then
-	    self.frames_waiting = self.frames_waiting - 1
-    end
+    --if self.frames_waiting > 0 then
+	--    self.frames_waiting = self.frames_waiting - 1
+    --end
 end
 
 function Enemy:draw()
-    if self.sprite then
-        love.graphics.draw(self.sprite, self.x, self.y)
+    if self.animation then
+        self.animation:draw(self.x, self.y)
     else
         print("No sprite found for enemy! Drawing rectangle instead.")
         love.graphics.rectangle("fill", self.x, self.y, 10, 10)
@@ -69,42 +62,55 @@ function Enemy:update_AI()
     if self.ai_state == "idle" then
          -- check if player is within range
 	 if dist_to_player <= self:get_pursuit_range() then
-		 self.ai_state = "chasing"
+		 self:set_ai("chasing")
 	 end
     elseif self.ai_state == "chasing" then
+	 self:pursue_player()
 	 -- check if nearby player, set state to 'nearby' if so
 	 if dist_to_player <= self:get_nearby_range() then
-		 self.ai_state = "nearby"
+		 self:set_ai("nearby")
 	 -- check if far from player, set state to 'idle' if so		 
-	 elseif dist_to_player > self:get_pursuit_range()+10 then
-		 self.ai_state = "idle"
+	 elseif dist_to_player > self:get_pursuit_range() then
+		 self:set_ai("idle")
 	 end
     elseif self.ai_state == "nearby" then
 	 -- wait for certain number of frames, if this is achieved then attack
-         if self.frames_waited == -1 then
-		 self.frames_waited = 30
-         elseif self.frames_waited == 0 then
-		 self.ai_state = "hitting"
+         if self.frames_waiting == 0 then
+		 self:set_ai("hitting")
 	 -- if player hits enemy now, will go to 'hurt' (ADD COLLISION DETECTION)
-         elseif player.ai_state == "hitting" then
+         elseif player.attacking then
 		 self.hp_stat = self.hp_stat - 1
-		 self.ai_state = "hurt"
+	 	 if self.hp_stat <= 0 then
+		     self:set_ai("dying")
+	         else
+		     self:set_ai("hurt")
+	         end
 	 -- if player moves certain dist away from enemy, then becomes 'chasing'		 
-	 elseif dist_to_player > self:get_nearby_range() then
-		 self.ai_state = "chasing"
+         elseif dist_to_player > self:get_nearby_range() then
+		 self:set_ai("chasing")
 	 end
     elseif self.ai_state == "hitting" then
 	 -- if animation has finished
+	 if not self.animation.playing then
+		 self:set_ai("nearby")
+	 end
          -- if player is colliding with enemy, will set them to hurt state
     elseif self.ai_state == "hurt" then
-	 -- wait for hurt animation to finish, then restore ai state
+	 -- wait for hurt animation to finish, then restore ai stat
+	 if not self.animation.playing then
+		 self:set_ai("idle")
+	 end
     elseif self.ai_state == "dying" then
 	 -- wait for dying animation to finish, then destroy self
-	 self.dead = true
+	 if not self.animation.playing then
+		 self.dead = true
+	 end
     end
 end
 
-function Enemy:set_AI(state)
+function Enemy:set_ai(state)
+    self.animation:reset()
+    self.animation.playing = true
     prev_state = self.ai_state
     self.ai_state = state
     if state == "idle" then
@@ -112,6 +118,7 @@ function Enemy:set_AI(state)
     elseif state == "chasing" then
 	 self.animation = self.animation_chasing
     elseif state == "nearby" then
+	 self.frames_waiting = 30  -- wait for 30 frames to hit player
 	 self.animation = self.animation_nearby
     elseif state == "hitting" then
 	 self.animation = self.animation_hitting
@@ -126,11 +133,11 @@ function Enemy:set_AI(state)
 end
 
 function Enemy:get_pursuit_range()
-    return 200
+    return 400
 end
 
 function Enemy:get_nearby_range()
-    return 50
+    return 25
 end
 
 function Enemy:pursue_player()

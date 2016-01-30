@@ -1,5 +1,6 @@
 require "lib.lm.Animation.Animation"
 
+require "maploader"
 require "gameobject"
 require "speech"
 require "player"
@@ -18,6 +19,8 @@ hud = nil
 world = {}
 mainMenu = {}
 world.objects = {}
+world.map = nil
+world.secondsElapsedInDay = 0
 GUI = {}
 GUI.objects = {}
 world.next_object_id = 0
@@ -43,12 +46,13 @@ function world:remove_game_object(id)
 end
 
 function love.load()
-    world.secondsElapsedInDay = 0
     player = Player.new()
     elder = Elder.new()
     hud = HUD.new()
     --Delete later
     mainMenu = MainMenu.new()
+
+    world.map = Map.new("Assets/map.lua")
 
     table.insert(GUI.objects, hud)
     world:add_game_object(player)
@@ -106,6 +110,7 @@ end
 
 function love.draw(dt)
     mainMenu.draw(dt)
+    world.map:draw()
     for i=1, #world.objects do
         world.objects[i]:draw()
     end
