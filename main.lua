@@ -7,17 +7,21 @@ require "elder"
 require "HUD"
 require "enemy"
 require "nymph"
+require "mainMenu"
 
 ENTITY_SPEED_MULTIPLIER = 20 -- multiplied by an entity's speed_stat to get it's real speed in pixels
+SCREEN_WIDTH = 790
 
 player = nil
 elder = nil
 hud = nil
 world = {}
+mainMenu = {}
 world.objects = {}
 GUI = {}
 GUI.objects = {}
 world.next_object_id = 0
+
 
 function world:add_game_object(g)
     -- Called when a new GameObject is created
@@ -43,6 +47,8 @@ function love.load()
     player = Player.new()
     elder = Elder.new()
     hud = HUD.new()
+    --Delete later
+    mainMenu = MainMenu.new()
 
     table.insert(GUI.objects, hud)
     world:add_game_object(player)
@@ -61,6 +67,7 @@ function love.load()
 end
 
 function love.update(dt)
+    mainMenu:update(dt)
     world.secondsElapsedInDay = world.secondsElapsedInDay + dt
 
     local idle = true
@@ -98,6 +105,7 @@ function love.update(dt)
 end
 
 function love.draw(dt)
+    mainMenu.draw(dt)
     for i=1, #world.objects do
         world.objects[i]:draw()
     end
@@ -110,4 +118,12 @@ function love.keypressed(key, scancode, isrepeat)
     if key == "space" then
         player:attack()
     end
+end
+
+function love.mousepressed(x, y, button, istouch)
+    mainMenu.mousepressed(x, y, button, istouch)
+end
+
+function love.mousereleased(x, y, button, istouch)
+    mainMenu.mousereleased(x, y, button, istouch)
 end
