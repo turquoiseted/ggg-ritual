@@ -1,8 +1,9 @@
 Player = {}
+setmetatable(Player, GameObject)
 Player.__index = Player
 
 function Player.new()
-    local p = {}
+    local p = GameObject.new()
     setmetatable(p, Player)
 
     p.x = 10
@@ -22,6 +23,7 @@ function Player.new()
     p.animation_left = Animation.newFromFile("Animations/player_left.lua")
     p.animation_right = Animation.newFromFile("Animations/player_right.lua")
     p.current_animation = p.animation_down
+    p.attacking = false
 
     return p
 end
@@ -70,5 +72,8 @@ function Player:idle()
 end
 
 function Player:add_inventory_item(item, count)
+end
 
+function Player:attack()
+    self.attacking = true
 end
