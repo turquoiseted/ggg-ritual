@@ -157,7 +157,9 @@ function Animation.newFromFile(file_path, settings)
 end
 
 function Animation:update(dt)
+    print(self.currentPlayingDirection)
     if not self.playing then return end
+    print("I am here")
     -- No need to update anything if there's only 1 frame.
     if self.numFrames == 1 then return end 
 
