@@ -45,9 +45,9 @@ function Enemy:update(dt)
         self.animation:update(dt)
     end
 
-    if self.frames_waiting > 0 then
-	    self.frames_waiting = self.frames_waiting - 1
-    end
+    --if self.frames_waiting > 0 then
+	--    self.frames_waiting = self.frames_waiting - 1
+    --end
 end
 
 function Enemy:draw()
