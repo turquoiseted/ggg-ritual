@@ -1,4 +1,4 @@
-require "lib.lovemachine.Animation.Animation"
+require "lib.lm.Animation.Animation"
 
 require "player"
 require "elder"
@@ -42,7 +42,6 @@ function love.update(dt)
         world.objects[i]:update(dt)
     end
 end
-
 
 function love.draw(dt)
     for i=1, #world.objects do
