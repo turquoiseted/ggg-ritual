@@ -9,11 +9,12 @@ function Player.new()
     p.y = 10
     p.vx = 0
     p.vy = 0
-    p.inventory = {}
+    p.inventory_size = 5
+    p.inventory = {[1]={}, [2]={}, [3]={}, [4]={}, [5]={}}
+
     p.health = 10
     p.strength = 10
     p.speed_stat = 10
-    p.const_speed_multiplier = 20
     p.width = 20
     p.height = 20
     p.animation_down = Animation.newFromFile("Animations/player_down.lua")
@@ -27,6 +28,15 @@ end
 
 function Player:draw()
     self.current_animation:draw(self.x, self.y)
+
+    -- Draw inventory
+    love.graphics.print("Inventory:", 10, love.graphics.getHeight() - 100)
+
+    for i=1, self.inventory_size do
+        if self.inventory[i].name then
+            love.graphics.print("Slot "..i..": "..self.inventory[1].name, 10, love.graphics.getHeight() - (90 - 10*i))
+        end
+    end
 end
 
 function Player:update(dt)
@@ -38,7 +48,7 @@ end
 function Player:move(direction)
     print("Player move called with direction: " .. direction)
 
-    c = self.const_speed_multiplier
+    c = ENTITY_SPEED_MULTIPLIER
     if direction == "left" then
         self.vx = -self.speed_stat * c
         self.current_animation = self.animation_left
@@ -57,4 +67,8 @@ end
 function Player:idle()
     self.vx = 0
     self.vy = 0
+end
+
+function Player:add_inventory_item(item, count)
+
 end

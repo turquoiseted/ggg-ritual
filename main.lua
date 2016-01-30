@@ -3,6 +3,10 @@ require "lib.lm.Animation.Animation"
 require "player"
 require "elder"
 require "HUD"
+require "enemy"
+require "nymph"
+
+ENTITY_SPEED_MULTIPLIER = 20 -- multiplied by an entity's speed_stat to get it's real speed in pixels
 
 player = nil
 elder = nil
@@ -19,6 +23,10 @@ function love.load()
     table.insert(GUI_objects, hud)
     table.insert(world.objects, player)
     table.insert(world.objects, elder)
+    local nymph = Nymph.new()
+    nymph.x = 300
+    nymph.y = 300
+    table.insert(world.objects, nymph)
 end
 
 function love.update(dt)
