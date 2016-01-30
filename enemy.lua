@@ -13,7 +13,13 @@ function Enemy.new()
     e.hp_state = 2
     e.speed_stat = 7
     e.ai_state = "idle"
-    e.animation =  nil
+    e.animation_idle = nil
+    e.animation_chasing = nil
+    e.animation_hitting = nil
+    e.animation_nearby = nil
+    e.animation_hurt = nil
+    e.animation_dying = nil
+    e.animation = nil
     e.frames_waited = -1  -- used for waiting to perform actions
 
     return e
@@ -40,7 +46,7 @@ function Enemy:update(dt)
     end
 
     if self.frames_waiting > 0 then
-	    self.frames_waiting -= 1
+	    self.frames_waiting = self.frames_waiting - 1
     end
 end
 
@@ -81,7 +87,7 @@ function Enemy:update_AI()
 		 self.ai_state = "hitting"
 	 -- if player hits enemy now, will go to 'hurt' (ADD COLLISION DETECTION)
          elseif player.ai_state == "hitting" then
-		 self.hp_stat -= 1
+		 self.hp_stat = self.hp_stat - 1
 		 self.ai_state = "hurt"
 	 -- if player moves certain dist away from enemy, then becomes 'chasing'		 
 	 elseif dist_to_player > self:get_nearby_range() then
@@ -94,6 +100,7 @@ function Enemy:update_AI()
 	 -- wait for hurt animation to finish, then restore ai state
     elseif self.ai_state == "dying" then
 	 -- wait for dying animation to finish, then destroy self
+	 self.dead = true
     end
 end
 
@@ -101,17 +108,17 @@ function Enemy:set_AI(state)
     prev_state = self.ai_state
     self.ai_state = state
     if state == "idle" then
-         self.animation = nil
+         self.animation = self.animation_idle
     elseif state == "chasing" then
-	 self.animation = nil
+	 self.animation = self.animation_chasing
     elseif state == "nearby" then
-	 self.animation = nil
+	 self.animation = self.animation_nearby
     elseif state == "hitting" then
-	 self.animation = nil
+	 self.animation = self.animation_hitting
     elseif state == "hurt" then
-	 self.animation = nil
+	 self.animation = self.animation_hurt
     elseif state == "dying" then
-	 self.animation = nil
+	 self.animation = self.animation_dying
     else
          self.ai_state = prev_state
 	 print("Invalid state: from ", self.ai_state, " to ", state)
