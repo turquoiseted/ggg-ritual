@@ -10,9 +10,11 @@ ENTITY_SPEED_MULTIPLIER = 20 -- multiplied by an entity's speed_stat to get it's
 
 player = nil
 elder = nil
+hud = nil
 world = {}
 world.objects = {}
-GUI_objects = {}
+GUI = {}
+GUI.objects = {}
 
 function love.load()
     world.secondsElapsedInDay = 0
@@ -20,7 +22,7 @@ function love.load()
     elder = Elder.new()
     hud = HUD.new()
 
-    table.insert(GUI_objects, hud)
+    table.insert(GUI.objects, hud)
     table.insert(world.objects, player)
     table.insert(world.objects, elder)
     local nymph = Nymph.new()
@@ -49,6 +51,10 @@ function love.update(dt)
         idle = false
     end
 
+    if love.keyboard.isDown("d") then
+        --debug
+    end
+
     if idle == true then
         player:idle()
     end
@@ -62,8 +68,8 @@ function love.draw(dt)
     for i=1, #world.objects do
         world.objects[i]:draw()
     end
-    for i=1, #GUI_objects do
-        GUI_objects[i]:draw()
+    for i=1, #GUI.objects do
+        GUI.objects[i]:draw()
     end
 end
 
