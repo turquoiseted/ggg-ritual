@@ -1,4 +1,5 @@
 require "lib.lm.Animation.Animation"
+local sti = require "lib.sti"
 
 require "gameobject"
 require "speech"
