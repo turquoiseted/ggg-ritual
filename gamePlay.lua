@@ -8,7 +8,7 @@ GamePlay.tasksByDay = {
             {123, 29},
             {123, 30},
             {123, 31}
-        }}
+        }},
         {"Find the Wood Nymphs’ home", {
             {}
         }},
