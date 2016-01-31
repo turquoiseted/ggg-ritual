@@ -93,7 +93,7 @@ function love.load()
     nymph.y = 300
     world:add_game_object(nymph)
 
-    world:load()
+    --world:load()
 end
 
 function love.update(dt)
