@@ -1061,7 +1061,10 @@ end
 function Map:getTileProperties(layer, x, y)
 	local tile = self.layers[layer].data[y][x]
 
-	if not tile then return {} end
+	if not tile then
+        print("Map:getTileProperties returning an empty table!")
+        return {}
+    end
 
 	return tile.properties
 end

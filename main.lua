@@ -1,6 +1,6 @@
 require "lib.lm.Animation.Animation"
+local sti = require "lib.sti"
 
-require "maploader"
 require "gameobject"
 require "speech"
 require "player"
@@ -10,8 +10,9 @@ require "enemy"
 require "nymph"
 require "mainMenu"
 
-ENTITY_SPEED_MULTIPLIER = 20 -- multiplied by an entity's speed_stat to get it's real speed in pixels
+ENTITY_SPEED_MULTIPLIER = 12 -- multiplied by an entity's speed_stat to get it's real speed in pixels
 SCREEN_WIDTH = 790
+COLLIDABLE_TILE_ID = 0
 
 player = nil
 elder = nil
@@ -24,7 +25,6 @@ world.secondsElapsedInDay = 0
 GUI = {}
 GUI.objects = {}
 world.next_object_id = 0
-
 
 function world:add_game_object(g)
     -- Called when a new GameObject is created
@@ -52,7 +52,19 @@ function love.load()
     --Delete later
     mainMenu = MainMenu.new()
 
-    world.map = Map.new("Assets/map.lua")
+    world.map = sti.new("Assets/actual_map/MAP.lua")
+
+    for k,v in pairs(world.map.layers["collisions"].data) do
+        print(k,v)
+    end
+
+    for i=4, 21 do
+        print("###### i: " .. i)
+        for k,v in pairs(world.map.layers["collisions"].data) do
+            print(k,v)
+        end
+        print()
+    end
 
     table.insert(GUI.objects, hud)
     world:add_game_object(player)
@@ -72,7 +84,11 @@ end
 
 function love.update(dt)
     mainMenu:update(dt)
+    world.map:update(dt)
     world.secondsElapsedInDay = world.secondsElapsedInDay + dt
+
+    world.camera_x = math.floor(player.x - love.graphics.getWidth() / 2)
+    world.camera_y = math.floor(player.y - love.graphics.getHeight() / 2)
 
     local idle = true
     if love.keyboard.isDown("left") then
@@ -81,6 +97,8 @@ function love.update(dt)
     elseif love.keyboard.isDown("right") then
         player:move("right")
         idle = false
+    else
+        player.vx = 0
     end
 
     if love.keyboard.isDown("up") then
@@ -89,6 +107,8 @@ function love.update(dt)
     elseif love.keyboard.isDown("down") then
         player:move("down")
         idle = false
+    else
+        player.vy = 0
     end
 
     if love.keyboard.isDown("d") then
@@ -101,7 +121,30 @@ function love.update(dt)
 
     for i=1, #world.objects do
         local obj = world.objects[i]
+
         obj:update(dt)
+        if obj._collidable then
+            -- Attempt horizontal movement first
+            local last_good_x = obj.x
+            obj.x = obj.x + obj.vx * dt
+            if not has_valid_position(obj) then
+                obj.x = last_good_x
+                obj.vx = 0
+            end
+
+            -- Then vertical movement
+            local last_good_y = obj.y
+            obj.y = obj.y + obj.vy * dt
+            if not has_valid_position(obj) then
+                obj.y = last_good_y
+                obj.vy = 0
+            end
+        else
+            -- Don't worry about collisions, just move it move it
+            obj.x = obj.x + obj.vx
+            obj.x = obj.x + obj.vy
+        end
+
         if obj._dead then
             world:remove_game_object(obj._id)
         end
@@ -109,11 +152,36 @@ function love.update(dt)
 end
 
 function love.draw(dt)
-    mainMenu.draw(dt)
+    --mainMenu.draw(dt)
+    
+    -- Translate the camera to be centered on the player
+    love.graphics.translate(-world.camera_x, -world.camera_y)
+
+    world.map:setDrawRange(world.camera_x, world.camera_y, love.graphics.getWidth(), love.graphics.getHeight())
     world.map:draw()
+    local mx, my = love.mouse.getPosition()
+    local rx, ry = mx + world.camera_x, my + world.camera_y
+    local tx, ty = world.map:convertScreenToTile(rx, ry)
+    tx = math.floor(tx) + 1
+    ty = math.floor(ty) + 1
+    love.graphics.print("Mouse (x,y): ("..mx..","..my..")", world.camera_x + 300, world.camera_y + 40)
+    love.graphics.print("Game world (x,y): ("..rx..","..ry..")", world.camera_x + 300, world.camera_y + 50)
+    love.graphics.print("Tile (x,y): ("..tx..","..ty..")", world.camera_x + 300, world.camera_y + 60)
+    love.graphics.print("Tile Is Collidable? ("..tostring(is_tile_collidable(tx,ty)), world.camera_x + 300, world.camera_y + 70)
+    love.graphics.print("Mouse Collides? "..tostring(does_point_collide(rx,ry)), world.camera_x + 300, world.camera_y + 80)
+
     for i=1, #world.objects do
-        world.objects[i]:draw()
+        local obj = world.objects[i]
+        obj:draw()
+        
+        if obj._collidable then -- draw it's bounding box for debugging
+            local r,g,b,a = love.graphics.getColor()
+            love.graphics.setColor(255,255,255,122)
+            love.graphics.rectangle("fill", obj.x, obj.y, obj._width, obj._height)
+            love.graphics.setColor(r,g,b,a)
+        end
     end
+
     for i=1, #GUI.objects do
         GUI.objects[i]:draw()
     end
@@ -131,4 +199,55 @@ end
 
 function love.mousereleased(x, y, button, istouch)
     mainMenu.mousereleased(x, y, button, istouch)
+end
+
+function is_tile_collidable(tx,ty)
+    local layer = world.map.layers["collisions"]
+    if layer then
+        print("Found collision layer")
+        local row = layer.data[ty]
+        if row then
+            print("Found row")
+            local tile = row[tx]
+            if tile then
+                print("Found tile. id="..tile.id)
+                if tile.id == COLLIDABLE_TILE_ID then -- collision occured
+                    return true
+                end
+            end
+        end
+    end
+
+    return false
+end
+
+function does_point_collide(x, y)
+    local tx, ty = world.map:convertScreenToTile(x, y)
+    tx = math.floor(tx) + 1
+    ty = math.floor(ty) + 1
+
+    return is_tile_collidable(tx,ty)
+end
+
+function has_valid_position(obj)
+    local w = obj._width
+    local h = obj._height
+
+    local x, y = obj.x, obj.y
+
+    if does_point_collide(obj.x, obj.y) then
+        print("Top left point collides!")
+        return false
+    elseif does_point_collide(obj.x + w, obj.y) then
+        print("Top right point collides!")
+        return false
+    elseif does_point_collide(obj.x, obj.y + h) then
+        print("Bottom left point collides!")
+        return false
+    elseif does_point_collide(obj.x + w, obj.y + h) then
+        print("Bottom right point collides!")
+        return false
+    end
+
+    return true
 end

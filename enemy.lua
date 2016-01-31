@@ -26,9 +26,6 @@ function Enemy.new()
 end
 
 function Enemy:update(dt)
-    self.x = self.x + self.vx * dt
-    self.y = self.y + self.vy * dt
-
     self.vx = 0
     self.vy = 0
 
@@ -141,7 +138,6 @@ function Enemy:get_nearby_range()
 end
 
 function Enemy:pursue_player()
-    print("Pursuing player!")
     -- Calculate direction to move
     dx = player.x - self.x
     dy = player.y - self.y

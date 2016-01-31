@@ -6,6 +6,9 @@ function Nymph.new()
     local n = Enemy.new()
     setmetatable(n, Nymph)
 
+    n._collidable = true
+    n._width = 32
+    n._height = 32
     n.sprite = love.graphics.newImage("Assets/nymph_static.png")
 
     return n

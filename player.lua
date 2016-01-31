@@ -6,8 +6,11 @@ function Player.new()
     local p = GameObject.new()
     setmetatable(p, Player)
 
-    p.x = 10
-    p.y = 10
+    p._collidable = true
+    p._width = 32
+    p._height = 32
+    p.x = 150*32
+    p.y = 20*32
     p.vx = 0
     p.vy = 0
     p.inventory_size = 5
@@ -30,26 +33,16 @@ end
 
 function Player:draw()
     self.current_animation:draw(self.x, self.y)
-
-    -- Draw inventory
-    love.graphics.print("Inventory:", 10, love.graphics.getHeight() - 100)
-
-    for i=1, self.inventory_size do
-        if self.inventory[i].name then
-            love.graphics.print("Slot "..i..": "..self.inventory[1].name, 10, love.graphics.getHeight() - (90 - 10*i))
-        end
-    end
 end
 
 function Player:update(dt)
     self.current_animation:update(dt)
-    self.x = self.x + self.vx * dt
-    self.y = self.y + self.vy * dt
 end
 
 function Player:move(direction)
     print("Player move called with direction: " .. direction)
 
+    self.current_animation:play()
     c = ENTITY_SPEED_MULTIPLIER
     if direction == "left" then
         self.vx = -self.speed_stat * c
@@ -69,6 +62,7 @@ end
 function Player:idle()
     self.vx = 0
     self.vy = 0
+    self.current_animation:pause()
 end
 
 function Player:add_inventory_item(item, count)
