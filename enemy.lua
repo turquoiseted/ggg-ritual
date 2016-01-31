@@ -36,9 +36,6 @@ function Enemy.new()
 end
 
 function Enemy:update(dt)
-    self.x = self.x + self.vx * dt
-    self.y = self.y + self.vy * dt
-
     self.vx = 0
     self.vy = 0
 

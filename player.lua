@@ -51,9 +51,6 @@ end
 
 function Player:update(dt)
     self.current_animation:update(dt)
-    self.x = self.x + self.vx * dt
-    self.y = self.y + self.vy * dt
-
     self:update_AI()
 end
 
