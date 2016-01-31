@@ -10,10 +10,13 @@ require "enemy"
 require "nymph"
 require "mainMenu"
 require "healthBar"
+require "SoundManager"
+require "gamePlay"
 
 ENTITY_SPEED_MULTIPLIER = 12 -- multiplied by an entity's speed_stat to get it's real speed in pixels
 SCREEN_WIDTH = 790
 COLLIDABLE_TILE_ID = 0
+DEBUG = false
 
 onMenu = true
 player = nil
@@ -25,9 +28,12 @@ healthBar = {}
 world.objects = {}
 world.map = nil
 world.secondsElapsedInDay = 0
+world.player_current_zone = "Village" -- Could be "Mine", "Lake", "Forest"
+world.next_object_id = 0
 GUI = {}
 GUI.objects = {}
-world.next_object_id = 0
+soundManager = SoundManager.new()
+gamePlay = GamePlay.new()
 
 function world:add_game_object(g)
     -- Called when a new GameObject is created
@@ -62,7 +68,6 @@ function love.load()
     mainMenu = MainMenu.new()
     healthBar = HealthBar.new()
 
-
     world.map = sti.new("Assets/_Map/MAP.lua")
     world.camera_x = math.floor(player.x - love.graphics.getWidth() / 2)
     world.camera_y = math.floor(player.y - love.graphics.getHeight() / 2)
@@ -72,9 +77,6 @@ function love.load()
 
     world:add_game_object(player)
     world:add_game_object(elder)
-
-    table.insert(world.objects, player)
-    table.insert(world.objects, elder)
 
     local nymph = Nymph.new()
     nymph.x = 300
@@ -95,6 +97,9 @@ function love.update(dt)
 
     world.camera_x = math.floor(player.x - love.graphics.getWidth() / 2)
     world.camera_y = math.floor(player.y - love.graphics.getHeight() / 2)
+
+    soundManager:update(dt)
+    gamePlay:update(dt)
 
     local idle = true
     if love.keyboard.isDown("left") then
@@ -173,11 +178,14 @@ function love.draw(dt)
     local tx, ty = world.map:convertScreenToTile(rx, ry)
     tx = math.floor(tx) + 1
     ty = math.floor(ty) + 1
-    love.graphics.print("Mouse (x,y): ("..mx..","..my..")", world.camera_x + 300, world.camera_y + 40)
-    love.graphics.print("Game world (x,y): ("..rx..","..ry..")", world.camera_x + 300, world.camera_y + 50)
-    love.graphics.print("Tile (x,y): ("..tx..","..ty..")", world.camera_x + 300, world.camera_y + 60)
-    love.graphics.print("Tile Is Collidable? ("..tostring(is_tile_collidable(tx,ty)), world.camera_x + 300, world.camera_y + 70)
-    love.graphics.print("Mouse Collides? "..tostring(does_point_collide(rx,ry)), world.camera_x + 300, world.camera_y + 80)
+
+    if DEBUG then
+        love.graphics.print("Mouse (x,y): ("..mx..","..my..")", world.camera_x + 300, world.camera_y + 40)
+        love.graphics.print("Game world (x,y): ("..rx..","..ry..")", world.camera_x + 300, world.camera_y + 50)
+        love.graphics.print("Tile (x,y): ("..tx..","..ty..")", world.camera_x + 300, world.camera_y + 60)
+        love.graphics.print("Tile Is Collidable? ("..tostring(is_tile_collidable(tx,ty)), world.camera_x + 300, world.camera_y + 70)
+        love.graphics.print("Mouse Collides? "..tostring(does_point_collide(rx,ry)), world.camera_x + 300, world.camera_y + 80)
+    end
 
     for i=1, #world.objects do
         local obj = world.objects[i]

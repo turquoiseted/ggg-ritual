@@ -95,8 +95,6 @@ function Player:set_ai(state)
 end
 
 function Player:move(direction)
-    print("Player move called with direction: " .. direction)
-
     self.current_animation:play()
     c = ENTITY_SPEED_MULTIPLIER
     if direction == "left" then
