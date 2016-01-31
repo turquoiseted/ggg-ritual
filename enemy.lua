@@ -92,11 +92,26 @@ function Enemy:update_AI()
 		 self:set_ai("hitting")
 	 -- if player hits enemy now, will go to 'hurt' (ADD COLLISION DETECTION)
          elseif player.attacking then
-		 self.hp_stat = self.hp_stat - 1
-	 	 if self.hp_stat <= 0 then
-		     self:set_ai("dying")
-	         else
-		     self:set_ai("hurt")
+		 succ_hit = false
+		 dx = player.x - self.x
+		 dy = player.y - self.y
+		 angle = math.atan2(dy, dx)
+	 	 if -math.pi/4 <= angle < math.pi/4 then
+			 succ_hit = (player.direction == "left")
+		 elseif math.pi/4 <= angle < 3*math.pi/4 then
+			 succ_hit = (player.direction == "down")
+		 elseif (3*math.pi/4 <= angle < math.pi) or (-math.pi <= angle < -3*math.pi/4) then
+			 succ_hit = (player.direction == "right")
+		 elseif -3*math.pi/4 <= angle < -math.pi/4 then
+			 succ_hit = (player.direction == "up")
+		 end
+		 if succ_hit then
+		     self.hp_stat = self.hp_stat - 1
+	 	     if self.hp_stat <= 0 then
+		         self:set_ai("dying")
+	             else
+		         self:set_ai("hurt")
+		     end
 	         end
 	 -- if player moves certain dist away from enemy, then becomes 'chasing'		 
          elseif dist_to_player > self:get_nearby_range() then
