@@ -44,14 +44,14 @@ function MainMenu.new()
 
     for i=1, numberOfButtons do
         table.insert(menu.buttons, {})
-        menu.buttons[i].normalImg = love.graphics.newImage("Assets/button" .. i .. "normal.png")
-        menu.buttons[i].pressedImg = love.graphics.newImage("Assets/button" .. i .. "pressed.png")
+        menu.buttons[i].normalImg = love.graphics.newImage("Assets/_UI/button.png")
+        menu.buttons[i].pressedImg = love.graphics.newImage("Assets/_UI/button.png")
         menu.buttons[i].action = buttonActions[i]
     end
 
-    menu.selectStartSound = love.audio.newSource("Assets/Sounds/selectstart.wav"
+    menu.selectStartSound = love.audio.newSource("Assets/_Sounds/selectstart.wav"
         , static)
-    menu.menuBackground = love.graphics.newImage("Assets/titlescreen.png")
+    menu.menuBackground = love.graphics.newImage("Assets/_UI/titlescreen.png")
     return menu
 end
 

@@ -3,7 +3,7 @@ setmetatable(ForestDemon, Enemy)
 ForestDemon.__index = ForestDemon
 
 function ForestDemon.new()
-    local f = ForestDemon.new()
+    local f = Enemy.new()
     setmetatable(f, ForestDemon)
 
     f.x = 0
@@ -14,19 +14,20 @@ function ForestDemon.new()
     f.damage_stat = 1
     f.speed_stat = 5
     f.ai_state = "idle"
-    f.animation_idle = Animation.newFromFile("Animations/enemy/forest_demon/enemy_idle.lua")
-    f.animation_chasing = Animation.newFromFile("Animations/enemy/forest_demon/enemy_walking.lua")
-    f.animation_hitting = Animation.newFromFile("Animations/enemy/forest_demon/enemy_hitting.lua")
-    f.animation_nearby = Animation.newFromFile("Animations/enemy/forest_demon/enemy_nearby.lua")
-    f.animation_hurt = Animation.newFromFile("Animations/enemy/forest_demon/enemy_hurt.lua")
-    f.animation_dying = Animation.newFromFile("Animations/enemy/forest_demon/enemy_dying.lua")
-    f.animation = f.animation_idle
+
+    f.animations.idle = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_up.lua")
+    f.animations.chasing = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_down.lua")
+    f.animations.hitting = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_attack.lua")
+    f.animations.nearby = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_down.lua")
+    f.animations.hurt = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_damage.lua")
+    f.animations.dying = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_dying.lua")
+    f.current_animation = f.animations.idle
 
     f.sounds = {}
-    f.sounds["walking"] = love.audio.newSource("Assets/Sounds/enemy/forest_demon/walking.wav")
-    f.sounds["hitting"] = love.audio.newSource("Assets/Sounds/enemy/forest_demon/hitting.wav")
-    f.sounds["hurt"] = love.audio.newSource("Assets/Sounds/enemy/forest_demon/hurt.wav")
-    f.sounds["dying"] = love.audio.newSource("Assets/Sounds/enemy/forest_demon/dying.wav")
+    f.sounds["walking"] = love.audio.newSource("Assets/_Sounds/enemy/forest_demon/walking.wav")
+    f.sounds["hitting"] = love.audio.newSource("Assets/_Sounds/enemy/forest_demon/hitting.wav")
+    f.sounds["hurt"] = love.audio.newSource("Assets/_Sounds/enemy/forest_demon/hurt.wav")
+    f.sounds["dying"] = love.audio.newSource("Assets/_Sounds/enemy/forest_demon/dying.wav")
 
     f.sounds["walking"]:setLooping(true)
 

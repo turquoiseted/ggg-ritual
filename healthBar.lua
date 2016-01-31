@@ -10,8 +10,8 @@ function HealthBar.new()
     setmetatable(healthBar, HealthBar)
 
     healthBar.health = 4
-    healthBar.heart_full = love.graphics.newImage("Assets/Misc-HUD/heart_empty.png")
-    healthBar.heart_empty = love.graphics.newImage("Assets/Misc-HUD/heart_full.png")
+    healthBar.heart_full = love.graphics.newImage("Assets/_UI/heart_empty.png")
+    healthBar.heart_empty = love.graphics.newImage("Assets/_UI/heart_full.png")
     return healthBar
 end
 

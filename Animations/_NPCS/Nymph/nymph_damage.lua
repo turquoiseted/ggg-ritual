@@ -1,0 +1,1 @@
+return {frames={{y=1,x=1},{y=1,x=2},{y=1,x=3}},imagePath="Assets/_NPCS/Nymph/nymph_damage.png",frameHeight=64,frameWidth=64,animationSettings={defaultDuration=0.18,loop=true,bounce=false,name="nymph_damage",drawOnFinish=true}}

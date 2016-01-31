@@ -20,17 +20,15 @@ function Player.new()
     p.speed_stat = 10
     p.width = 20
     p.height = 20
-    p.animation_down_idle = Animation.newFromFile("Animations/player/player_down.lua")
-    p.animation_up_idle   = Animation.newFromFile("Animations/player/player_up.lua")
-    p.animation_left_idle = Animation.newFromFile("Animations/player/player_left.lua")
-    p.animation_right_idle = Animation.newFromFile("Animations/player/player_right.lua")
-    p.animation_down_attack = nil
-    p.animation_up_attack = nil
-    p.animation_left_attack = nil
-    p.animation_right_attack = nil
-    p.animation_hurt = nil
-    p.animation_dying = nil
-    p.current_animation = p.animation_down_idle
+
+    p.animations = {}
+    p.animations.down = Animation.newFromFile("Animations/_Player/player_down.lua")
+    p.animations.up = Animation.newFromFile("Animations/_Player/player_up.lua")
+    p.animations.left = Animation.newFromFile("Animations/_Player/player_left.lua")
+    p.animations.right = Animation.newFromFile("Animations/_Player/player_right.lua")
+    p.animations.attack = Animation.newFromFile("Animations/_Player/player_attack.lua")
+    p.animations.dying = Animation.newFromFile("Animations/_Player/player_death.lua")
+    p.current_animation = p.animations.down
 
     p.ai_state = "idle"   --can be idle, walking, hitting, hurt, jumping or dying
     p.direction = "down"  --can be up, down, left or right
@@ -51,8 +49,6 @@ end
 
 function Player:update(dt)
     self.current_animation:update(dt)
-    self.x = self.x + self.vx * dt
-    self.y = self.y + self.vy * dt
 
     self:update_AI()
 end
@@ -69,32 +65,34 @@ function Player:update_AI()
 end
 
 function Player:set_ai(state)
-    self.animation:reset()
-    self.animation.playing = true
+    self.current_animation:reset()
+    self.current_animation.playing = true
     prev_state = self.ai_state
     self.ai_state = state
+
     if state == "idle" or state == "walking" or state == "jumping" then
-        if self.direction == "up" then self.animation = self.animation_up_idle
-	elseif self.direction == "down" then self.animation = self.animation_down_idle
-	elseif self.direction == "left" then self.animation = self.animation_left_idle
-	elseif self.direction == "right" then self.animation = self.animation_right_idle
+        if self.direction == "up" then
+            self.current_animation = self.animations.up
+        elseif self.direction == "down" then
+            self.current_animation = self.animations.down
+        elseif self.direction == "left" then
+            self.current_animation = self.animations.left
+        elseif self.direction == "right" then
+            self.current_animation = self.animations.right
+        end
+
+        if state == "idle" then
+            self.current_animation.playing = false
+        elseif state == "hitting" then
+            self.frames_waiting = 30  -- wait for 30 frames to hit player
+            self.current_animation = self.animations.attack
+        elseif state == "dying" then
+            self.current_animation = self.animation_dying
+        else
+            self.ai_state = prev_state
+            print("Invalid state: from ", self.ai_state, " to ", state)
+        end
 	end
-	if state == "idle" then self.animation.playing = false end
-    elseif state == "hitting" then
-	self.frames_waiting = 30  -- wait for 30 frames to hit player
-	if self.direction == "up" then self.animation = self.animation_up_attack
-	elseif self.direction == "down" then self.animation = self.animation_down_attack
-	elseif self.direction == "left" then self.animation = self.animation_left_attack
-	elseif self.direction == "right" then self.animation = self.animation_right_attack
-	end
-    elseif state == "hurt" then
-	self.animation = self.animation_hurt
-    elseif state == "dying" then
-	 self.animation = self.animation_dying
-    else
-         self.ai_state = prev_state
-	 print("Invalid state: from ", self.ai_state, " to ", state)
-    end
 end
 
 function Player:move(direction)
@@ -104,16 +102,16 @@ function Player:move(direction)
     c = ENTITY_SPEED_MULTIPLIER
     if direction == "left" then
         self.vx = -self.speed_stat * c
-        self.current_animation = self.animation_left_idle
+        self.current_animation = self.animations.left
     elseif direction == "right" then
         self.vx = self.speed_stat * c
-        self.current_animation = self.animation_right_idle
+        self.current_animation = self.animations.right
     elseif direction == "down" then
         self.vy = self.speed_stat * c
-        self.current_animation = self.animation_down_idle
+        self.current_animation = self.animations.down
     elseif direction == "up" then
         self.vy = -self.speed_stat * c
-        self.current_animation = self.animation_up_idle
+        self.current_animation = self.animations.up
     end
 end
 
@@ -121,9 +119,6 @@ function Player:idle()
     self.vx = 0
     self.vy = 0
     self.current_animation:pause()
-end
-
-function Player:add_inventory_item(item, count)
 end
 
 function Player:attack()

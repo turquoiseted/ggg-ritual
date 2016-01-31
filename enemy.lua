@@ -14,21 +14,22 @@ function Enemy.new()
     e.damage_stat = 1
     e.speed_stat = 7
     e.ai_state = "idle"
-    e.animation_idle = Animation.newFromFile("Animations/enemy/enemy_idle.lua")
-    e.animation_chasing = Animation.newFromFile("Animations/enemy/enemy_chasing.lua")
-    e.animation_hitting = Animation.newFromFile("Animations/enemy/enemy_hitting.lua")
-    e.animation_nearby = Animation.newFromFile("Animations/enemy/enemy_nearby.lua")
-    e.animation_hurt = Animation.newFromFile("Animations/enemy/enemy_hurt.lua")
-    e.animation_dying = Animation.newFromFile("Animations/enemy/enemy_dying.lua")
-    e.animation = e.animation_idle
+
+    -- Should be set by child class
+    e.animations = {}
+    e.animations["idle"] = nil
+    e.animations["chasing"] = nil
+    e.animations["hitting"] = nil
+    e.animations["nearby"] = nil
+    e.animations["hurt"] = nil
+    e.animations["dying"] = nil
+    e.current_animation = e.animations["idle"]
 
     e.sounds = {}
-    e.sounds["walking"] = love.audio.newSource("Assets/Sounds/enemy/walking.wav")
-    e.sounds["hitting"] = love.audio.newSource("Assets/Sounds/enemy/hitting.wav")
-    e.sounds["hurt"] = love.audio.newSource("Assets/Sounds/enemy/hurt.wav")
-    e.sounds["dying"] = love.audio.newSource("Assets/Sounds/enemy/dying.wav")
-
-    e.sounds["walking"]:setLooping(true)
+    e.sounds["walking"] = nil
+    e.sounds["hitting"] = nil
+    e.sounds["hurt"] = nil
+    e.sounds["dying"] = nil
 
     e.frames_waiting = -1  -- used for waiting to perform actions
 
@@ -44,8 +45,8 @@ function Enemy:update(dt)
 
     self:update_AI()
 
-    if self.animation then
-        self.animation:update(dt)
+    if self.current_animation then
+        self.current_animation:update(dt)
     end
 
     if self.frames_waiting > 0 then
@@ -54,8 +55,8 @@ function Enemy:update(dt)
 end
 
 function Enemy:draw()
-    if self.animation then
-        self.animation:draw(self.x, self.y)
+    if self.current_animation then
+        self.current_animation:draw(self.x, self.y)
     else
         print("No sprite found for enemy! Drawing rectangle instead.")
         love.graphics.rectangle("fill", self.x, self.y, 10, 10)
@@ -109,7 +110,7 @@ function Enemy:update_AI()
 		 self.sounds["hitting"]:play()
 	 end
 	 -- if animation has finished
-	 if not self.animation.playing then
+	 if not self.current_animation.playing then
 		 self:set_ai("nearby")
 	 end
          -- if player is colliding with enemy, will set them to hurt state
@@ -118,7 +119,7 @@ function Enemy:update_AI()
 	 if not self.sounds["hurt"]:isPlaying() then
 		 self.sounds["hurt"]:play()
 	 end
-	 if not self.animation.playing then
+	 if not self.current_animation.playing then
 		 self:set_ai("idle")
 	 end
     elseif self.ai_state == "dying" then
@@ -126,33 +127,33 @@ function Enemy:update_AI()
 	 if not self.sounds["dying"]:isPlaying() then
 		 self.sounds["dying"]:play()
 	 end
-	 if not self.animation.playing then
-		 self.dead = true
+	 if not self.current_animation.playing then
+		 self._dead = true
 	 end
     end
 end
 
 function Enemy:set_ai(state)
-    self.animation:reset()
-    self.animation.playing = true
+    self.current_animation:reset()
+    self.current_animation.playing = true
     prev_state = self.ai_state
     self.ai_state = state
     if state == "idle" then
-         self.animation = self.animation_idle
+        self.current_animation = self.animations.idle
     elseif state == "chasing" then
-	 self.animation = self.animation_chasing
+        self.current_animation = self.animations.chasing
     elseif state == "nearby" then
-	 self.frames_waiting = 30  -- wait for 30 frames to hit player
-	 self.animation = self.animation_nearby
+	    self.frames_waiting = 30  -- wait for 30 frames to hit player
+	    self.current_animation = self.animations.nearby
     elseif state == "hitting" then
-	 self.animation = self.animation_hitting
+        self.current_animation = self.animations.hitting
     elseif state == "hurt" then
-	 self.animation = self.animation_hurt
+        self.current_animation = self.animations.hurt
     elseif state == "dying" then
-	 self.animation = self.animation_dying
+        self.current_animation = self.animations.dying
     else
-         self.ai_state = prev_state
-	 print("Invalid state: from ", self.ai_state, " to ", state)
+        self.ai_state = prev_state
+        print("Invalid state: from ", self.ai_state, " to ", state)
     end
 end
 

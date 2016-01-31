@@ -14,19 +14,19 @@ function RockBat.new()
     f.damage_stat = 2
     f.speed_stat = 4
     f.ai_state = "idle"
-    f.animation_idle = Animation.newFromFile("Animations/enemy/rock_bat/enemy_idle.lua")
-    f.animation_chasing = Animation.newFromFile("Animations/enemy/rock_bat/enemy_walking.lua")
-    f.animation_hitting = Animation.newFromFile("Animations/enemy/rock_bat/enemy_hitting.lua")
-    f.animation_nearby = Animation.newFromFile("Animations/enemy/rock_bat/enemy_nearby.lua")
-    f.animation_hurt = Animation.newFromFile("Animations/enemy/rock_bat/enemy_hurt.lua")
-    f.animation_dying = Animation.newFromFile("Animations/enemy/rock_bat/enemy_dying.lua")
-    f.animation = f.animation_idle
+    f.animations.idle = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_up.lua")
+    f.animations.chasing = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_down.lua")
+    f.animations.hitting = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_attack.lua")
+    f.animations.nearby = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_down.lua")
+    f.animations.hurt = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_damage.lua")
+    f.animations.dying = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_dying.lua")
+    f.current_animation = f.animations.idle
 
     f.sounds = {}
-    f.sounds["walking"] = love.audio.newSource("Assets/Sounds/enemy/rock_bat/walking.wav")
-    f.sounds["hitting"] = love.audio.newSource("Assets/Sounds/enemy/rock_bat/hitting.wav")
-    f.sounds["hurt"] = love.audio.newSource("Assets/Sounds/enemy/rock_bat/hurt.wav")
-    f.sounds["dying"] = love.audio.newSource("Assets/Sounds/enemy/rock_bat/dying.wav")
+    f.sounds["walking"] = love.audio.newSource("Assets/_Sounds/enemy/rock_bat/walking.wav")
+    f.sounds["hitting"] = love.audio.newSource("Assets/_Sounds/enemy/rock_bat/hitting.wav")
+    f.sounds["hurt"] = love.audio.newSource("Assets/_Sounds/enemy/rock_bat/hurt.wav")
+    f.sounds["dying"] = love.audio.newSource("Assets/_Sounds/enemy/rock_bat/dying.wav")
 
     f.sounds["walking"]:setLooping(true)
 

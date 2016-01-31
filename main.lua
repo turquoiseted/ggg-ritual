@@ -63,19 +63,7 @@ function love.load()
     healthBar = HealthBar.new()
 
 
-    world.map = sti.new("Assets/actual_map/MAP.lua")
---[[
-    for k,v in pairs(world.map.layers["collisions"].data) do
-        print(k,v)
-    end
-
-    for i=4, 21 do
-        print("###### i: " .. i)
-        for k,v in pairs(world.map.layers["collisions"].data) do
-            print(k,v)
-        end
-        print()
-    end]]
+    world.map = sti.new("Assets/_Map/MAP.lua")
     world.camera_x = math.floor(player.x - love.graphics.getWidth() / 2)
     world.camera_y = math.floor(player.y - love.graphics.getHeight() / 2)
 

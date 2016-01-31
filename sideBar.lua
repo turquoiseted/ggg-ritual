@@ -18,8 +18,8 @@ function SideBar.new()
     local sideBar = {}
     setmetatable(sideBar, SideBar)
     --sideBar.sun_animation = Animation.newFromFile("Animations/sun.lua")
-    sideBar.sunBackgroundPanel = love.graphics.newImage("Assets/woodpanel150.png")
-    sideBar.scroll = love.graphics.newImage("Assets/scroll.png")
+    sideBar.sunBackgroundPanel = love.graphics.newImage("Assets/_UI/woodpanel150.png")
+    sideBar.scroll = love.graphics.newImage("Assets/_UI/scroll.png")
     sideBar.tasks = {"Go kill a dragon!"}
     --sideBar:update_time(0)
     return sideBar

@@ -3,43 +3,45 @@ setmetatable(Ghost, Enemy)
 Ghost.__index = Ghost
 
 function Ghost.new()
-    local f = Ghost.new()
+    local g = Enemy.new()
     setmetatable(f, Ghost)
 
-    f.x = 0
-    f.y = 0
-    f.vx = 0
-    f.vy = 0
-    f.hp_stat = 3
-    f.damage_stat = 2
-    f.speed_stat = 8
-    f.ai_state = "idle"
-    f.animation_idle = Animation.newFromFile("Animations/enemy/ghost/enemy_idle.lua")
-    f.animation_chasing = Animation.newFromFile("Animations/enemy/ghost/enemy_walking.lua")
-    f.animation_hitting = Animation.newFromFile("Animations/enemy/ghost/enemy_hitting.lua")
-    f.animation_nearby = Animation.newFromFile("Animations/enemy/ghost/enemy_nearby.lua")
-    f.animation_hurt = Animation.newFromFile("Animations/enemy/ghost/enemy_hurt.lua")
-    f.animation_dying = Animation.newFromFile("Animations/enemy/ghost/enemy_dying.lua")
-    f.animation = f.animation_idle
+    g.x = 0
+    g.y = 0
+    g.vx = 0
+    g.vy = 0
+    g.hp_stat = 3
+    g.damage_stat = 2
+    g.speed_stat = 8
+    g.ai_state = "idle"
 
-    f.sounds = {}
-    f.sounds["walking"] = love.audio.newSource("Assets/Sounds/enemy/ghost/walking.wav")
-    f.sounds["hitting"] = love.audio.newSource("Assets/Sounds/enemy/ghost/hitting.wav")
-    f.sounds["hurt"] = love.audio.newSource("Assets/Sounds/enemy/ghost/hurt.wav")
-    f.sounds["dying"] = love.audio.newSource("Assets/Sounds/enemy/ghost/dying.wav")
+    -- FIX THIS TO ACTUAL ANIMATIONS
+    g.animations.idle = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_up.lua")
+    g.animations.chasing = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_down.lua")
+    g.animations.hitting = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_attack.lua")
+    g.animations.nearby = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_down.lua")
+    g.animations.hurt = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_damage.lua")
+    g.animations.dying = Animation.newFromFile("Animations/_NPCS/Nymph/nymph_dying.lua")
+    g.current_animation = f.animations.idle
 
-    f.sounds["walking"]:setLooping(true)
+    g.sounds = {}
+    g.sounds["walking"] = love.audio.newSource("Assets/_Sounds/enemy/ghost/walking.wav")
+    g.sounds["hitting"] = love.audio.newSource("Assets/_Sounds/enemy/ghost/hitting.wav")
+    g.sounds["hurt"] = love.audio.newSource("Assets/_Sounds/enemy/ghost/hurt.wav")
+    g.sounds["dying"] = love.audio.newSource("Assets/_Sounds/enemy/ghost/dying.wav")
 
-    f.frames_waiting = -1  -- used for waiting to perform actions
+    g.sounds["walking"]:setLooping(true)
 
-    return f
+    g.frames_waiting = -1  -- used for waiting to perform actions
+
+    return g
 end
 
-function ForestDemon:get_pursuit_range()
+function Ghost:get_pursuit_range()
     return 400
 end
 
-function ForestDemon:get_nearby_range()
+function Ghost:get_nearby_range()
     return 25
 end
 
