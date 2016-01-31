@@ -13,7 +13,7 @@ function Player.new()
     p.y = 20*32
     p.vx = 0
     p.vy = 0
-    p.inventory = []
+    p.inventory = nil
 
     p.health = 10
     p.strength = 10
@@ -30,7 +30,7 @@ function Player.new()
     p.animation_right_attack = nil
     p.animation_hurt = nil
     p.animation_dying = nil
-    p.current_animation = p.animation_down
+    p.current_animation = p.animation_down_idle
 
     p.ai_state = "idle"   --can be idle, walking, hitting, hurt, jumping or dying
     p.direction = "down"  --can be up, down, left or right
@@ -104,16 +104,16 @@ function Player:move(direction)
     c = ENTITY_SPEED_MULTIPLIER
     if direction == "left" then
         self.vx = -self.speed_stat * c
-        self.current_animation = self.animation_left
+        self.current_animation = self.animation_left_idle
     elseif direction == "right" then
         self.vx = self.speed_stat * c
-        self.current_animation = self.animation_right
+        self.current_animation = self.animation_right_idle
     elseif direction == "down" then
         self.vy = self.speed_stat * c
-        self.current_animation = self.animation_down
+        self.current_animation = self.animation_down_idle
     elseif direction == "up" then
         self.vy = -self.speed_stat * c
-        self.current_animation = self.animation_up
+        self.current_animation = self.animation_up_idle
     end
 end
 
