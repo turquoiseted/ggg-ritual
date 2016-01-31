@@ -49,7 +49,6 @@ end
 
 function Player:update(dt)
     self.current_animation:update(dt)
-
     self:update_AI()
 end
 
