@@ -9,9 +9,9 @@ GamePlay.tasksByDay = {
             {123, 30},
             {123, 31}
         }}
-    }--[[,
-    {
-        {"Find the Wood Nymphs’ home", 0, 0 },
+        {"Find the Wood Nymphs’ home", {
+            {}
+        }},
         {"Find a way to heal the blacksmith", 0, 0 },
         {"Return to your Elder", 0, 0 }
     },{
