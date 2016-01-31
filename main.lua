@@ -68,6 +68,7 @@ function love.load()
     mainMenu = MainMenu.new()
     healthBar = HealthBar.new()
 
+
     world.map = sti.new("Assets/_Map/MAP.lua")
     world.camera_x = math.floor(player.x - love.graphics.getWidth() / 2)
     world.camera_y = math.floor(player.y - love.graphics.getHeight() / 2)
@@ -83,7 +84,7 @@ function love.load()
     nymph.y = 300
     world:add_game_object(nymph)
 
-    world:load()
+    --world:load()
 end
 
 function love.update(dt)
