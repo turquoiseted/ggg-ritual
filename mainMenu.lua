@@ -10,11 +10,17 @@ local buttonHeight = 50
 local waitTime = 0
 local isWaiting = false
 
+local renderGame = false
+
 local buttonActions = {
     function (menu)
-        print("New Game")
         love.audio.play(menu.selectStartSound)
-
+        menu:startTimer(0.75, function ()
+            menu.isButtonPressed = false
+            menu:startTimer(1, function ()
+                world:load()
+            end)
+        end)
     end,
     function () love.quit() end
 }
@@ -32,6 +38,9 @@ function MainMenu.new()
     menu.buttons = {}
     menu.isButtonPressed = false
     menu.buttonPressedID = 1
+    menu.timerStart = false;
+    menu.timeLeft = 0
+    menu.timerAction = function () end
 
     for i=1, numberOfButtons do
         table.insert(menu.buttons, {})
@@ -49,28 +58,31 @@ end
 
 function MainMenu:draw(dt)
     currentDrawPosition = paddingStart
-    for i=1, #buttons do
+    love.graphics.draw(self.menuBackground, 0, 0)
+    for i=1, #self.buttons do
         local drawingImg = nil;
-        if menu.isButtonPressed and menu.buttonPressedID == i then
-            drawingImg = menu.buttons[i].pressedImg
+        if self.isButtonPressed and self.buttonPressedID == i then
+            drawingImg = self.buttons[i].pressedImg
         else
-            drawingImg = menu.buttons[i].normalImg
+            drawingImg = self.buttons[i].normalImg
         end
-        menu.buttons[i].xPos = (SCREEN_WIDTH - buttonWidth) / 2
-        menu.buttons[i].yPos = currentDrawPosition
-        drawingImg.draw(self.buttonImage,
-            menu.buttons[i].xPos,
-            menu.buttons[i].yPos)
+        self.buttons[i].xPos = (SCREEN_WIDTH - buttonWidth) / 2
+        self.buttons[i].yPos = currentDrawPosition
+        love.graphics.draw(drawingImg,
+            self.buttons[i].xPos,
+            self.buttons[i].yPos)
+        currentDrawPosition = currentDrawPosition + buttonHeight + buttonPadding
     end
 end
 
 function MainMenu:mousepressed(x, y, button, istouch)
-    for i=1, #buttons do
-        if button == 1 and isCoordInRect(x, y,
-            buttons[i].xPos,
-            buttons[i].yPos,
+    for i=1, #self.buttons do
+        local hasCollided = isCoordInRect(x, y,
+            self.buttons[i].xPos,
+            self.buttons[i].yPos,
             buttonWidth,
-            buttonHeight) then
+            buttonHeight)
+        if button == "l" and hasCollided then
             self.isButtonPressed = true
             self.buttonPressedID = i
             return;
@@ -81,9 +93,23 @@ end
 function MainMenu:mousereleased(x, y, button, istouch)
     if self.isButtonPressed then
         self.buttons[self.buttonPressedID].action(self)
-        love.audio.play()
+        love.audio.play(self.selectStartSound)
     end
 end
 
+
+function MainMenu:startTimer(time, func)
+    self.timerStart = true
+    self.timeLeft = time
+    self.timerAction = func
+end
+
 function MainMenu:update(dt)
+    if self.timerStart then
+        self.timeLeft = self.timeLeft - dt
+        if self.timeLeft < 0 then
+            self.timerAction()
+            self.timerStart = true
+        end
+    end
 end

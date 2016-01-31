@@ -5,20 +5,23 @@ require "gameobject"
 require "speech"
 require "player"
 require "elder"
-require "HUD"
+require "sideBar"
 require "enemy"
 require "nymph"
 require "mainMenu"
+require "healthBar"
 
 ENTITY_SPEED_MULTIPLIER = 12 -- multiplied by an entity's speed_stat to get it's real speed in pixels
 SCREEN_WIDTH = 790
 COLLIDABLE_TILE_ID = 0
 
+onMenu = true
 player = nil
 elder = nil
-hud = nil
+sideBar = nil
 world = {}
 mainMenu = {}
+healthBar = {}
 world.objects = {}
 world.map = nil
 world.secondsElapsedInDay = 0
@@ -45,15 +48,23 @@ function world:remove_game_object(id)
     end
 end
 
+function world:load()
+    onMenu = false
+    love.update(0)
+    elder:speak("Hello there!", 2)
+end
+
 function love.load()
     player = Player.new()
     elder = Elder.new()
-    hud = HUD.new()
+    sideBar = SideBar.new()
     --Delete later
     mainMenu = MainMenu.new()
+    healthBar = HealthBar.new()
+
 
     world.map = sti.new("Assets/actual_map/MAP.lua")
-
+--[[
     for k,v in pairs(world.map.layers["collisions"].data) do
         print(k,v)
     end
@@ -64,13 +75,16 @@ function love.load()
             print(k,v)
         end
         print()
-    end
+    end]]
+    world.camera_x = math.floor(player.x - love.graphics.getWidth() / 2)
+    world.camera_y = math.floor(player.y - love.graphics.getHeight() / 2)
 
-    table.insert(GUI.objects, hud)
+    table.insert(GUI.objects, sideBar)
+    table.insert(GUI.objects, healthBar)
+
     world:add_game_object(player)
     world:add_game_object(elder)
 
-    table.insert(GUI.objects, hud)
     table.insert(world.objects, player)
     table.insert(world.objects, elder)
 
@@ -79,11 +93,15 @@ function love.load()
     nymph.y = 300
     world:add_game_object(nymph)
 
-    elder:speak("Hello there!", 2)
+    world:load()
 end
 
 function love.update(dt)
-    mainMenu:update(dt)
+    if onMenu then
+        mainMenu:update(dt)
+        return
+    end
+
     world.map:update(dt)
     world.secondsElapsedInDay = world.secondsElapsedInDay + dt
 
@@ -152,8 +170,11 @@ function love.update(dt)
 end
 
 function love.draw(dt)
-    --mainMenu.draw(dt)
-    
+    if onMenu then
+        mainMenu:draw(dt)
+        return;
+    end
+
     -- Translate the camera to be centered on the player
     love.graphics.translate(-world.camera_x, -world.camera_y)
 
@@ -173,7 +194,7 @@ function love.draw(dt)
     for i=1, #world.objects do
         local obj = world.objects[i]
         obj:draw()
-        
+
         if obj._collidable then -- draw it's bounding box for debugging
             local r,g,b,a = love.graphics.getColor()
             love.graphics.setColor(255,255,255,122)
@@ -188,29 +209,35 @@ function love.draw(dt)
 end
 
 function love.keypressed(key, scancode, isrepeat)
-    if key == "space" then
-        player:attack()
+    if not onMenu then
+        if key == "space" then
+            player:attack()
+        end
     end
 end
 
 function love.mousepressed(x, y, button, istouch)
-    mainMenu.mousepressed(x, y, button, istouch)
+    if onMenu then
+        mainMenu:mousepressed(x, y, button, istouch)
+    end
 end
 
 function love.mousereleased(x, y, button, istouch)
-    mainMenu.mousereleased(x, y, button, istouch)
+    if onMenu then
+        mainMenu:mousereleased(x, y, button, istouch)
+    end
 end
 
 function is_tile_collidable(tx,ty)
     local layer = world.map.layers["collisions"]
     if layer then
-        print("Found collision layer")
+        --print("Found collision layer")
         local row = layer.data[ty]
         if row then
-            print("Found row")
+            --print("Found row")
             local tile = row[tx]
             if tile then
-                print("Found tile. id="..tile.id)
+                --print("Found tile. id="..tile.id)
                 if tile.id == COLLIDABLE_TILE_ID then -- collision occured
                     return true
                 end

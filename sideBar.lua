@@ -1,5 +1,5 @@
-HUD = {}
-HUD.__index = HUD
+SideBar = {}
+SideBar.__index = SideBar
 
 local sun_time = 10*60
 local sun_periods = 9;
@@ -14,19 +14,19 @@ local tasksPaddingRight = 24
 local tasksTextWidth = panelWidth - tasksPaddingRight - tasksPaddingLeft
 local tasksSpacing = 15
 
-function HUD.new()
-    local hud = {}
-    setmetatable(hud, HUD)
-    --hud.sun_animation = Animation.newFromFile("Animations/sun.lua")
-    hud.sunBackgroundPanel = love.graphics.newImage("Assets/woodpanel150.png")
-    hud.scroll = love.graphics.newImage("Assets/scroll.png")
-    hud.tasks = {"Go kill a dragon!"}
-    --hud:update_time(0)
-    return hud
+function SideBar.new()
+    local sideBar = {}
+    setmetatable(sideBar, SideBar)
+    --sideBar.sun_animation = Animation.newFromFile("Animations/sun.lua")
+    sideBar.sunBackgroundPanel = love.graphics.newImage("Assets/woodpanel150.png")
+    sideBar.scroll = love.graphics.newImage("Assets/scroll.png")
+    sideBar.tasks = {"Go kill a dragon!"}
+    --sideBar:update_time(0)
+    return sideBar
 end
 
-function HUD:draw()
-    --hud.sun_animation.currentFrameIndex = self.sun_animations[math.floor(world.secondsElapsedInDay / sun_period_time)]
+function SideBar:draw()
+    --self.sun_animation.currentFrameIndex = self.sun_animations[math.floor(world.secondsElapsedInDay / sun_period_time)]
     love.graphics.draw(self.sunBackgroundPanel, world.camera_x + 0, world.camera_y + 0)
     love.graphics.draw(self.scroll, world.camera_x + 0, world.camera_y + sunPositionSize)
 
@@ -46,6 +46,6 @@ function HUD:draw()
     --self.sun_animation:draw(sunPadding, sunPadding)
 end
 
-function HUD:addNewTask(taskText)
+function SideBar:addNewTask(taskText)
     table.insert(self.tasks, taskText)
 end
