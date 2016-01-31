@@ -1,0 +1,1 @@
+return {frames={{y=1,x=1},{y=1,x=2}},imagePath="Assets/_NPCS/Demon/demon_left.png",frameHeight=32,frameWidth=32,animationSettings={defaultDuration=0.25,loop=true,bounce=false,name="",drawOnFinish=true}}
