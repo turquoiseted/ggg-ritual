@@ -20,6 +20,15 @@ function Enemy.new()
     e.animation_hurt = Animation.newFromFile("Animations/enemy/enemy_hurt.lua")
     e.animation_dying = Animation.newFromFile("Animations/enemy/enemy_dying.lua")
     e.animation = e.animation_idle
+
+    e.sounds = {}
+    e.sounds["walking"] = love.audio.newSource("Assets/Sounds/enemy/walking.wav")
+    e.sounds["hitting"] = love.audio.newSource("Assets/Sounds/enemy/hitting.wav")
+    e.sounds["hurt"] = love.audio.newSource("Assets/Sounds/enemy/hurt.wav")
+    e.sounds["dying"] = love.audio.newSource("Assets/Sounds/enemy/dying.wav")
+
+    e.sounds["walking"]:setLooping(true)
+
     e.frames_waiting = -1  -- used for waiting to perform actions
 
     return e
@@ -63,11 +72,16 @@ function Enemy:update_AI()
 	 end
     elseif self.ai_state == "chasing" then
 	 self:pursue_player()
+	 if not self.sounds["walking"]:isPlaying() then
+	     self.sounds["walking"]:play()
+         end
 	 -- check if nearby player, set state to 'nearby' if so
 	 if dist_to_player <= self:get_nearby_range() then
+		 self.sounds["walking"]:stop()
 		 self:set_ai("nearby")
 	 -- check if far from player, set state to 'idle' if so		 
 	 elseif dist_to_player > self:get_pursuit_range() then
+		 self.sounds["walking"]:stop()
 		 self:set_ai("idle")
 	 end
     elseif self.ai_state == "nearby" then
@@ -87,6 +101,9 @@ function Enemy:update_AI()
 		 self:set_ai("chasing")
 	 end
     elseif self.ai_state == "hitting" then
+	 if not self.sounds["hitting"]:isPlaying() then
+		 self.sounds["hitting"]:play()
+	 end
 	 -- if animation has finished
 	 if not self.animation.playing then
 		 self:set_ai("nearby")
@@ -94,11 +111,17 @@ function Enemy:update_AI()
          -- if player is colliding with enemy, will set them to hurt state
     elseif self.ai_state == "hurt" then
 	 -- wait for hurt animation to finish, then restore ai stat
+	 if not self.sounds["hurt"]:isPlaying() then
+		 self.sounds["hurt"]:play()
+	 end
 	 if not self.animation.playing then
 		 self:set_ai("idle")
 	 end
     elseif self.ai_state == "dying" then
 	 -- wait for dying animation to finish, then destroy self
+	 if not self.sounds["dying"]:isPlaying() then
+		 self.sounds["dying"]:play()
+	 end
 	 if not self.animation.playing then
 		 self.dead = true
 	 end
@@ -112,6 +135,7 @@ function Enemy:set_ai(state)
     self.ai_state = state
     if state == "idle" then
          self.animation = self.animation_idle
+
     elseif state == "chasing" then
 	 self.animation = self.animation_chasing
     elseif state == "nearby" then
