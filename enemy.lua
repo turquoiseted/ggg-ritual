@@ -10,7 +10,8 @@ function Enemy.new()
     e.y = 0
     e.vx = 0
     e.vy = 0
-    e.hp_state = 2
+    e.hp_stat = 2
+    e.damage_stat = 1
     e.speed_stat = 7
     e.ai_state = "idle"
     e.animation_idle = Animation.newFromFile("Animations/enemy/enemy_idle.lua")
@@ -35,6 +36,9 @@ function Enemy.new()
 end
 
 function Enemy:update(dt)
+    self.x = self.x + self.vx * dt
+    self.y = self.y + self.vy * dt
+
     self.vx = 0
     self.vy = 0
 
@@ -44,9 +48,9 @@ function Enemy:update(dt)
         self.animation:update(dt)
     end
 
-    --if self.frames_waiting > 0 then
-	--    self.frames_waiting = self.frames_waiting - 1
-    --end
+    if self.frames_waiting > 0 then
+        self.frames_waiting = self.frames_waiting - 1
+    end
 end
 
 function Enemy:draw()
@@ -135,7 +139,6 @@ function Enemy:set_ai(state)
     self.ai_state = state
     if state == "idle" then
          self.animation = self.animation_idle
-
     elseif state == "chasing" then
 	 self.animation = self.animation_chasing
     elseif state == "nearby" then
